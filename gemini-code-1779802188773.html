@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>7th Grade ELA Quest & Reward Zone</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --panel-dark: #1e293b;
+      --accent: #a855f7;
+      --accent-hover: #9333ea;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 2px solid var(--panel-dark);
+      margin-bottom: 2rem;
+    }
+
+    .logo-zone h1 {
+      font-size: 1.8rem;
+      color: var(--accent);
+    }
+
+    .logo-zone p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .stats-hub {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .stat-box {
+      background: var(--panel-dark);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      border: 1px solid #334155;
+    }
+
+    .screen {
+      display: none;
+      background: var(--panel-dark);
+      padding: 2rem;
+      border-radius: 1rem;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* Menu Buttons */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .menu-grid { grid-template-columns: 1fr; }
+    }
+
+    button {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .menu-btn {
+      background: #1e293b;
+      border: 2px solid var(--accent);
+      color: var(--text-main);
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      text-align: left;
+      font-size: 1.1rem;
+    }
+
+    .menu-btn:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .menu-btn span {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .menu-btn:hover span {
+      color: #f3e8ff;
+    }
+
+    .nav-btn {
+      background: #334155;
+      color: var(--text-main);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      margin-bottom: 1rem;
+    }
+
+    .nav-btn:hover { background: #475569; }
+
+    /* Quiz Styles */
+    .q-meta {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .q-text {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .choices-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .choice-btn {
+      background: #0f172a;
+      border: 1px solid #475569;
+      color: var(--text-main);
+      padding: 1rem;
+      text-align: left;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .choice-btn:hover:not(.locked) {
+      border-color: var(--accent);
+      background: #131f38;
+    }
+
+    .choice-btn.correct {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: var(--success);
+    }
+
+    .choice-btn.wrong {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--danger);
+    }
+
+    .choice-btn.locked { cursor: not-allowed; }
+
+    .feedback-box {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      display: none;
+      line-height: 1.4;
+    }
+
+    .feedback-box.show { display: block; }
+    .feedback-box.correct-fb { background: rgba(34, 197, 94, 0.15); border-left: 4px solid var(--success); }
+    .feedback-box.wrong-fb { background: rgba(239, 68, 68, 0.15); border-left: 4px solid var(--danger); }
+
+    .action-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+
+    .primary-btn {
+      background: var(--accent);
+      color: var(--text-main);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      display: none;
+    }
+    .primary-btn.show { display: block; }
+    .primary-btn:hover { background: var(--accent-hover); }
+
+    /* Store Styles */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .shop-grid { grid-template-columns: 1fr; }
+    }
+
+    .shop-item {
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 1.25rem;
+      border-radius: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .item-info h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .item-info p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
+    
+    .buy-btn {
+      background: #334155;
+      color: var(--text-main);
+      border: none;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      font-weight: bold;
+      width: 100%;
+    }
+    .buy-btn.affordable {
+      background: var(--accent);
+    }
+    .buy-btn.affordable:hover { background: var(--accent-hover); }
+    .buy-btn.owned {
+      background: var(--success);
+      cursor: not-allowed;
+    }
+
+    .inventory-list {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px dashed #334155;
+    }
+
+    .inventory-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .inv-tag {
+      background: #334155;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo-zone">
+      <h1 onclick="goHome()" style="cursor:pointer">ELA Quest Zone</h1>
+      <p>7th Grade Core Skills Mastery</p>
+    </div>
+    <div class="stats-hub">
+      <div id="wallet-disp" class="stat-box">⭐ 0 pts</div>
+      <div id="streak-disp" class="stat-box">🔥 0</div>
+    </div>
+  </header>
+
+  <div id="home-screen" class="screen active">
+    <h2>Select Your Practice Objective</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Earn points on every question to spend in the virtual item shop!</p>
+    
+    <div class="menu-grid">
+      <button class="menu-btn" onclick="startQuiz('rhetoric')">
+        📣 Persuasion & Rhetoric
+        <span>Ethos, Pathos, Logos & Stylistic Devices</span>
+      </button>
+      <button class="menu-btn" onclick="startQuiz('comprehension')">
+        🧩 Reading Frameworks
+        <span>TTS/TTW/TTT, Thin vs. Thick, SWBSTF Summaries</span>
+      </button>
+      <button class="menu-btn" onclick="startQuiz('vocab')">
+        📖 Vocabulary Domains
+        <span>Context Clues, Character Dev, Academic Terms</span>
+      </button>
+      <button class="menu-btn" onclick="switchScreen('shop-screen')">
+        🛒 The Virtual NeeDoh Shop
+        <span>Trade your earned points for epic digital rewards</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="quiz-screen" class="screen">
+    <button class="nav-btn" onclick="goHome()">⬅️ Quit Session</button>
+    <div id="q-meta" class="q-meta">Category</div>
+    <div id="q-text" class="q-text">Loading question content...</div>
+    <div id="choices-stack" class="choices-stack"></div>
+    <div id="feedback-box" class="feedback-box"></div>
+    <div class="action-row">
+      <button id="next-btn" class="primary-btn" onclick="nextQuestion()">Next Question ➡️</button>
+    </div>
+  </div>
+
+  <div id="shop-screen" class="screen">
+    <button class="nav-btn" onclick="goHome()">⬅️ Back to Map</button>
+    <h2>The NeeDoh & Squishy Emporium</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">Use your individual practice point currency to claim virtual novelties!</p>
+    
+    <div id="shop-grid" class="shop-grid"></div>
+
+    <div class="inventory-list">
+      <h3>Your Claimed Collection Vault</h3>
+      <div id="inventory-tags" class="inventory-tags">No novelty rewards claimed yet. Go practice!</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // =========================================================
+  // 7TH GRADE LEVEL QUESTION DATABASE 
+  // =========================================================
+  const DATA = {
+    rhetoric: [
+      {
+        cat: "Rhetorical Appeals — Ethos",
+        q: "Which sentence relies primarily on ETHOS to persuade the reader?",
+        choices: [
+          "As a licensed pediatrician with over twenty years of clinical practice, I assure you this vaccine routine is safe.",
+          "Think of the innocent children who will suffer agonizing aches if we do not provide basic medical access today.",
+          "Statistical modeling shows that every single dollar spent on preventive care saves communities seven dollars later.",
+          "Our competitor's medicine has caused dynamic rashes in twelve reported cases across state lines last autumn."
+        ],
+        correct: 0,
+        feedback: "Ethos establishes credibility, authority, or character. Pointing out professional licensing and twenty years of experience builds trust in the speaker's background."
+      },
+      {
+        cat: "Rhetorical Appeals — Pathos",
+        q: "An advertisement features a picture of a lonely, shivering puppy in the rain while sad music plays. What appeal is this using?",
+        choices: [
+          "Logos, because it proves puppies need shelter using outdoor physics metrics.",
+          "Pathos, because it targets the reader's emotions of pity, sadness, and empathy to force action.",
+          "Ethos, because the puppy is an expert witness on local weather trends.",
+          "Parallel structure, because the rain matches the structural layout of the musical composition."
+        ],
+        correct: 1,
+        feedback: "Pathos targets your emotional core. Sad imagery, vulnerable subjects, and moving background elements are standard strategies used to prompt empathy or guilt."
+      },
+      {
+        cat: "Rhetorical Appeals — Logos",
+        q: "Identify the option that relies cleanly on LOGOS:",
+        choices: [
+          "My grandmother always said that eating an apple an hour keeps your humors well balanced.",
+          "If you don't buy this home security system tonight, your family will be completely exposed to immediate danger.",
+          "According to data from the National Highway Traffic Safety Admin, wearing seatbelts reduces injury risks by 45%.",
+          "Our ancestors fought bravely for these fields; do not let their memory dissolve away into historical obscurity."
+        ],
+        correct: 2,
+        feedback: "Logos utilizes facts, data, statistics, and clear deductive reasoning. Citing controlled data percentages from a National Administration is a logical appeal."
+      },
+      {
+        cat: "Rhetorical Devices — Parallel Structure",
+        q: "Which of the following sentences exhibits true PARALLEL STRUCTURE?",
+        choices: [
+          "During the summer, the teenager enjoyed swimming in lakes, hiking up steep mountains, and to cook open fires.",
+          "Our team needs to focus on tracking the metrics, analyzing the trends, and presenting the final discoveries.",
+          "She decided she would either run in the marathon or she might be choosing to take a long bicycle ride instead.",
+          "To complete the project, you must write a deep summary, drawing a map layout, and speak clearly."
+        ],
+        correct: 1,
+        feedback: "Parallel structure requires identical grammatical patterns across lists. 'Tracking...', 'analyzing...', and 'presenting...' all match using continuous gerund patterns perfectly."
+      },
+      {
+        cat: "Rhetorical Devices — Allusion",
+        q: "What is the author doing when they use an ALLUSION in a persuasive text?",
+        choices: [
+          "They are repeating the same starting consonant sounds in a row to create a musical rhyme effect.",
+          "They make a brief, indirect reference to a well-known person, historical event, piece of literature, or myth.",
+          "They state a direct exaggeration that no human could possibly take as literal fact.",
+          "They structure sentences using identical word lengths to make reading pace quick."
+        ],
+        correct: 1,
+        feedback: "An allusion points directly or indirectly to common cultural touchstones (like referencing Hercules to explain strength) to instantly convey deep meaning without long explanations."
+      },
+      {
+        cat: "Rhetorical Devices — Repetition",
+        q: "Why do persuasive writers deliberately implement REPETITION in their speeches?",
+        choices: [
+          "To confuse the opposing team so they cannot write a counter-argument paper.",
+          "To emphasize an important central concept and hammer it into the audience's memory banks.",
+          "To hide the fact that they do not possess any verified statistical proof items.",
+          "To meet a mandatory structural word count required by tournament rules."
+        ],
+        correct: 1,
+        feedback: "Repeating key words, core slogans, or structural refrains draws attention to those concepts, driving emphasis and making the thesis memorable."
+      }
+    ],
+    comprehension: [
+      {
+        cat: "Connections — Text-to-Text (TTT)",
+        q: "Marcus notices that the primary conflict in the article about wilderness survival matches the struggles Brian faces in the novel 'Hatchet'. What connection is this?",
+        choices: [
+          "Text-to-Self (TTS)",
+          "Text-to-World (TTW)",
+          "Text-to-Text (TTT)",
+          "Text-to-Teacher (TTT)"
+        ],
+        correct: 2,
+        feedback: "Comparing characters, structural conflicts, or motifs between two distinct print pieces is a Text-to-Text connection."
+      },
+      {
+        cat: "Connections — Text-to-World (TTW)",
+        q: "While reading a story about a town experiencing a severe drought, Brenda starts thinking about current global warming patterns and water restriction laws in California. What connection is she making?",
+        choices: [
+          "Text-to-Self (TTS)",
+          "Text-to-World (TTW)",
+          "Text-to-Text (TTT)",
+          "Text-to-Theory (TTT)"
+        ],
+        correct: 1,
+        feedback: "A Text-to-World connection links elements of a narrative directly to real-world current events, historical trends, or overarching societal systems."
+      },
+      {
+        cat: "Questioning — Thin vs. Thick",
+        q: "Which of the following questions would be classified as a THICK question for a text about immigration systems?",
+        choices: [
+          "In what calendar year did the island processing facility open?",
+          "What was the total dollar cost of an entry visa stamp in 1910?",
+          "How do the emotional sacrifices made by early families compare to modern migrant struggles?",
+          "Who was the prime administrative officer running the facility?"
+        ],
+        correct: 2,
+        feedback: "Thick questions require deep analytical thinking, evaluation, and synthesis. They cannot be answered with a single literal data fact from the page, unlike Thin questions."
+      },
+      {
+        cat: "Summarizing — SWBSTF Protocol",
+        q: "In the SWBSTF summary structure strategy, what do the 'B' and the 'S' symbols represent?",
+        choices: [
+          "Beginning / Summary",
+          "But (The Problem) / So (The Solution)",
+          "Background / Setting",
+          "Biography / Structural elements"
+        ],
+        correct: 1,
+        feedback: "SWBSTF stands for Somebody (Character), Wanted (Goal), BUT (Problem/Conflict), SO (Solution/Action), THEN (Outcome), FINALLY (Resolution)."
+      }
+    ],
+    vocab: [
+      {
+        cat: "Vocabulary — Context Clues",
+        q: "Read this excerpt: 'Despite the rowdy chaos across the stadium layout, the referee remained IMPERTURBABLE, calmly reviewing the play footage without tracking the angry shouts.' What does IMPERTURBABLE mean?",
+        choices: [
+          "Easily annoyed or highly sensitive to sudden movements.",
+          "Incapable of being upset, panicked, or agitated; steadily calm.",
+          "Completely blind or lacking basic visual accuracy metrics.",
+          "Dishonest and prone to altering rules for financial payout."
+        ],
+        correct: 1,
+        feedback: "The context phrases 'despite the rowdy chaos' and 'calmly reviewing' serve as contrast clues pointing to an unshakeable, calm definition."
+      },
+      {
+        cat: "Vocabulary — Character Development",
+        q: "An author changes a character's dialogue from short, angry outbursts in Chapter 1 to open, thoughtful paragraphs in Chapter 10. This structural shifts reveals what concept?",
+        choices: [
+          "Static character attributes.",
+          "Dynamic character development.",
+          "Academic context clue patterns.",
+          "Text-to-Self narrative constraints."
+        ],
+        correct: 1,
+        feedback: "Dynamic characters alter their perspectives, maturity levels, behaviors, or outlooks across the plot arc as a direct result of text events."
+      },
+      {
+        cat: "Vocabulary — Academic Terms",
+        q: "What does the word SUBSTANTIATE mean when used in an academic writing prompt?",
+        choices: [
+          "To translate a text from an ancient vocabulary set into English text.",
+          "To provide solid evidence, data, or source quotes to verify that a claim is true.",
+          "To delete the opening thesis paragraph to compress the structural layout.",
+          "To write using colorful figurative language instead of direct data profiles."
+        ],
+        correct: 1,
+        feedback: "To substantiate an argument means to back it up or prove it using sound evidence, text quotes, or research data statistics."
+      },
+      {
+        cat: "Vocabulary — Figurative Language",
+        q: "Identify the exact type of figurative device in this line: 'The old machinery groaned and complained as it forced its rusty gears to turn.'",
+        choices: [
+          "Allusion",
+          "Personification",
+          "Parallel Structure",
+          "Academic Logos"
+        ],
+        correct: 1,
+        feedback: "Attributing human traits like 'groaning' and 'complaining' to inanimate objects (machinery) is personification."
+      }
+    ]
+  };
+
+  // =========================================================
+  // VIRTUAL STORE ITEMS (NEE DOHS & SQUISHIES)
+  // =========================================================
+  const SHOP_ITEMS = [
+    { id: "nd_classic", name: "Classic Groovy NeeDoh", desc: "The OG stress reliever. Squish it, pull it, swap it. Cyber neon finish.", cost: 40 },
+    { id: "nd_shimmer", name: "Shimmer Magic NeeDoh", desc: "Infused with galaxy glitter swirls. Changes colors under desk lamps.", cost: 80 },
+    { id: "sq_axolotl", name: "Super-Slow-Rise Axolotl Squishy", desc: "Takes a full 45 seconds to expand back out. Highly satisfying matte finish.", cost: 120 },
+    { id: "nd_cat", name: "Cool Cat NeeDoh Ball", desc: "Equipped with tiny ears and whiskers. Resists all desk roll-off events.", cost: 160 },
+    { id: "nd_gumdrop", name: "Jumbo Teeny NeeDoh Pack", desc: "A bundle of 3 micro gumdrop variants. Fits in a pencil pouch container.", cost: 220 },
+    { id: "sq_kraken", name: "The Mythic Glow-in-the-Dark Kraken Squishy", desc: "Extremely rare collector novelty. Charges up under classroom light setups.", cost: 350 }
+  ];
+
+  // =========================================================
+  // STATE ENGINES 
+  // =========================================================
+  let wallet = parseInt(localStorage.getItem('ela_wallet') || '0');
+  let currentStreak = 0;
+  let currentPool = [];
+  let currentQIndex = 0;
+  let isAnswered = false;
+  let ownedItems = JSON.parse(localStorage.getItem('ela_owned') || '[]');
+
+  // Initialize App Setup
+  window.onload = function() {
+    refreshStats();
+    buildShopUI();
+  };
+
+  function refreshStats() {
+    document.getElementById('wallet-disp').textContent = `⭐ ${wallet} pts`;
+    document.getElementById('streak-disp').textContent = `🔥 ${currentStreak}`;
+    localStorage.setItem('ela_wallet', wallet);
+    localStorage.setItem('ela_owned', JSON.stringify(ownedItems));
+  }
+
+  function switchScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'shop-screen') buildShopUI();
+  }
+
+  function goHome() { switchScreen('home-screen'); }
+
+  // =========================================================
+  // QUIZ LOGIC FUNCTIONS
+  // =========================================================
+  function startQuiz(categoryKey) {
+    // Clone and shuffle selection arrays
+    let sourceQuestions = DATA[categoryKey];
+    currentPool = [...sourceQuestions].sort(() => Math.random() - 0.5);
+    currentQIndex = 0;
+    switchScreen('quiz-screen');
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    isAnswered = false;
+    let qData = currentPool[currentQIndex];
+    
+    document.getElementById('q-meta').textContent = `Objective: ${qData.cat} (${currentQIndex + 1}/${currentPool.length})`;
+    document.getElementById('q-text').textContent = qData.q;
+    
+    let fbBox = document.getElementById('feedback-box');
+    fbBox.className = "feedback-box";
+    fbBox.textContent = "";
+    
+    document.getElementById('next-btn').classList.remove('show');
+    
+    let stack = document.getElementById('choices-stack');
+    stack.innerHTML = "";
+    
+    const pref = ["A", "B", "C", "D"];
+    qData.choices.forEach((choiceText, index) => {
+      let btn = document.createElement('button');
+      btn.className = "choice-btn";
+      btn.innerHTML = `<strong style="color:var(--accent); margin-right:0.5rem">${pref[index]}.</strong> ${choiceText}`;
+      btn.onclick = () => evaluateChoice(index, qData, btn);
+      stack.appendChild(btn);
+    });
+  }
+
+  function evaluateChoice(selectedIndex, questionData, clickedBtn) {
+    if (isAnswered) return;
+    isAnswered = true;
+    
+    // Lock down all choice interactive elements
+    document.querySelectorAll('.choice-btn').forEach(b => b.classList.add('locked'));
+    
+    let fbBox = document.getElementById('feedback-box');
+    
+    if (selectedIndex === questionData.correct) {
+      clickedBtn.classList.add('correct');
+      currentStreak++;
+      
+      // Points distribution calculations matching streak levels
+      let basePayout = 10;
+      let streakBonus = currentStreak >= 3 ? 5 : 0;
+      let totalEarned = basePayout + streakBonus;
+      
+      wallet += totalEarned;
+      
+      fbBox.innerHTML = `<strong>🎉 Excellent! (+${totalEarned} pts)</strong><br>${questionData.feedback}`;
+      fbBox.classList.add('show', 'correct-fb');
+    } else {
+      clickedBtn.classList.add('wrong');
+      currentStreak = 0; // Breakdown current streak multiplier
+      
+      // Highlight correct answer tracking asset
+      let correctButton = document.querySelectorAll('.choice-btn')[questionData.correct];
+      if (correctButton) correctButton.classList.add('correct');
+      
+      fbBox.innerHTML = `<strong>⚠️ Focus Check:</strong><br>${questionData.feedback}`;
+      fbBox.classList.add('show', 'wrong-fb');
+    }
+    
+    refreshStats();
+    document.getElementById('next-btn').classList.add('show');
+  }
+
+  function nextQuestion() {
+    currentQIndex++;
+    if (currentQIndex >= currentPool.length) {
+      alert(`🎯 Activity complete! You successfully navigated all modules in this review pathway.`);
+      goHome();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  // =========================================================
+  // STORE FRONTEND BUILD ENGINE
+  // =========================================================
+  function buildShopUI() {
+    let grid = document.getElementById('shop-grid');
+    grid.innerHTML = "";
+    
+    SHOP_ITEMS.forEach(item => {
+      let box = document.createElement('div');
+      box.className = "shop-item";
+      
+      let isOwned = ownedItems.includes(item.id);
+      let isAffordable = wallet >= item.cost;
+      
+      let stateClass = "buy-btn";
+      let btnLabel = `🎟️ Claim (${item.cost} pts)`;
+      
+      if (isOwned) {
+        stateClass += " owned";
+        btnLabel = "⭐ Claimed into Collection";
+      } else if (isAffordable) {
+        stateClass += " affordable";
+      }
+      
+      box.innerHTML = `
+        <div class="item-info">
+          <h3>${item.name}</h3>
+          <p>${item.desc}</p>
+        </div>
+        <button class="${stateClass}" onclick="purchaseItem('${item.id}', ${item.cost}, ${isOwned}, ${isAffordable})">${btnLabel}</button>
+      `;
+      grid.appendChild(box);
+    });
+
+    // Generate Vault Inventory Badges
+    let invBox = document.getElementById('inventory-tags');
+    if (ownedItems.length === 0) {
+      invBox.textContent = "No novelty rewards claimed yet. Go practice!";
+    } else {
+      invBox.innerHTML = "";
+      ownedItems.forEach(id => {
+        let matchingData = SHOP_ITEMS.find(i => i.id === id);
+        if (matchingData) {
+          let span = document.createElement('span');
+          span.className = "inv-tag";
+          span.textContent = `📦 ${matchingData.name}`;
+          invBox.appendChild(span);
+        }
+      });
+    }
+  }
+
+  function purchaseItem(id, cost, owned, affordable) {
+    if (owned) return;
+    if (!affordable) {
+      alert("Insufficient points balances! Access further practice pathways to replenish point assets.");
+      return;
+    }
+    
+    wallet -= cost;
+    ownedItems.push(id);
+    refreshStats();
+    buildShopUI();
+    alert("✨ Item secured! The novelty has been logged directly inside your collection vault.");
+  }
+</script>
+</body>
+</html>
